@@ -3,7 +3,7 @@ C# utility function collection
 
 * __CmdArgs__  
   Handle command line arguments.  
-  Options can be specified by '/' or '-'. Options can have multiple names. Multiple data types supported. Anonymous arguments.
+  Options can be specified by '/' or '-'. Options can have multiple names. Option parameters can be separated by a space or '='. Multiple data types supported. Anonymous arguments. Automatic help text generation.
 
 * __IntelHEX__  
   Create/decode Intel HEX files.  
@@ -14,7 +14,7 @@ C# utility function collection
   Supports 'margin', which defaults to 1.2. On live displays you are often working near round numbers, and don't want the units to keep changhing. For example, you don't want to flip between 999 and 1k constantly, and a 1.2 margin will allow up to 1200 before changinng to 1.2k.
 
 * __BinaryUnits__  
-  Convert to and from binary units (1K = 1024 etc.)
+  Convert to and from binary units (1K = 1024 etc.)  
   JEDEC standard.
 
 * __TextUtils__  
