@@ -19,7 +19,7 @@ namespace Keio.Utils
 			for (int exp = 0; exp <= 8; exp ++)
 			{
 				BigInteger m = (BigInteger)(Math.Pow(1024, (double)exp + 1) * margin);		// calculate every time to avoid precision/rounding errors
-				if (v < m)
+				if (v <= m)
 				{
 					m = (long)Math.Pow(1024, (double)exp);
 					if (idx >= 0)

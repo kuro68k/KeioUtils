@@ -44,7 +44,7 @@ namespace Keio.Utils
 			for (int exp = -21; exp <= 24; exp += 3)
 			{
 				double m = Math.Pow(10, (double)exp) * margin;		// calculate every time to avoid precision/rounding errors
-				if (v < m)
+				if (v <= m)
 				{
 					m = Math.Pow(10, (double)exp - 3);
 					s = (v / m).ToString(format) + Prefixes[idx];
