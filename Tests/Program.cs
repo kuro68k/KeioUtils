@@ -49,6 +49,13 @@ namespace Tests
 			double v;
 			SIUnits.ParseSINumber("1.2k", out v);
 			Console.WriteLine(v.ToString());
+			Console.WriteLine();
+
+			Console.WriteLine(BinaryUnits.ToBinaryUnits(256) + "B");
+			Console.WriteLine(BinaryUnits.ToBinaryUnits(1024) + "B");
+			Console.WriteLine(BinaryUnits.ToBinaryUnits((1024 * 1024 * 2) + 25323) + "B");
+			Console.WriteLine(BinaryUnits.ToBinaryUnits(1234567890123456789) + "B");
+			Console.WriteLine();
 		}
 	}
 }

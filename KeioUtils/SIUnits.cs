@@ -10,6 +10,7 @@ namespace Keio.Utils
 	{
 		public static readonly string[] Prefixes = { "y", "z", "a", "f", "p", "n", "μ", "m", "", "k", "M", "G", "T", "P", "E", "Z", "Y" };
 
+		// convert a number to a string with SI suffix
 		public static string ToSIUnits(int v, double margin = 1.2)
 		{
 			return ToSIUnits((double)v, "F0", margin);
