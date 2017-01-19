@@ -7,8 +7,8 @@
     <ProjectGuid>{643F51F2-5721-4BA6-B44F-7F8189BC90BB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>KeioLibrary</RootNamespace>
-    <AssemblyName>KeioLibrary</AssemblyName>
+    <RootNamespace>Keio.Utils</RootNamespace>
+    <AssemblyName>Keio.Utils</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
