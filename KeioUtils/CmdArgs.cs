@@ -23,31 +23,36 @@ namespace Keio.Utils
 		private bool _required;
 		private Action<dynamic> _assign;
 		private string _help;
+		private string _parameter_help;
 		private bool _matched;
+		private bool _anonymous;
 
 		public bool IsRequired { get { return _required; } }
-		public bool IsAnonymous { get { return (_names == null); } }
+		public bool IsAnonymous { get { return _anonymous; } }
 		public bool WasMatched { get { return _matched; } set { _matched = value; } }
 		public string Name { get { if (_names != null) return _names[0]; else return "(anon)"; } }
 		public string AllNames { get { return string.Join(",", _names); } }
 		public dynamic Value { get { return _value; } set { _value = value; } }
+		public string Help { get { return _help; } set { _help = value; } }
+		public string ParameterHelp { get { return _parameter_help; } set { _parameter_help = value; } }
 		public ArgType Type { get { return _type; } }
 
 		public CmdArgument(string names, ArgType type,
 						   string help = "",
+						   string parameter_help = "",
 						   bool required = false,
+						   bool anonymous = false,
 						   Action<dynamic> assign = default(Action<dynamic>))
 		{
 			_type = type;
 			_value = NewArgType(type);
-			if (!string.IsNullOrEmpty(names))
-				_names = names.Split(',');
-			else
-				_names = null;
+			_names = names.Split(',');
 			_required = required;
 			_assign = assign;
 			_help = help;
+			_parameter_help = parameter_help;
 			_matched = false;
+			_anonymous = anonymous;
 		}
 
 		// generate a new dynamic object with type suitable for ArgType
@@ -318,6 +323,54 @@ namespace Keio.Utils
 			foreach (CmdArgument ca in _argList)
 			{
 				Console.WriteLine(ca.Name + "\t" + ca.Value.ToString());
+			}
+		}
+
+		// print help
+		public void PrintHelp()
+		{
+			PrintHelp(System.AppDomain.CurrentDomain.FriendlyName);
+		}
+		
+		public void PrintHelp(string appName)
+		{
+			// headline
+			Console.Write(appName);
+			Console.Write(" [options]");
+			foreach (CmdArgument ca in _argList)
+			{
+				if (ca.IsAnonymous)
+				{
+					Console.Write(" <");
+					string s = ca.Name;
+					if (string.IsNullOrEmpty(s))
+						s = ca.ParameterHelp;
+					if (string.IsNullOrEmpty(s))
+						s = "<anonymous argument>";
+					Console.Write(s);
+					Console.Write(">");
+				}
+			}
+			Console.WriteLine();
+
+			// options
+			foreach (CmdArgument ca in _argList)
+			{
+				if (!ca.IsAnonymous)
+				{
+					Console.Write("  -");
+					Console.Write(ca.Name);
+					if (!string.IsNullOrEmpty(ca.ParameterHelp))
+						Console.Write(" <" + ca.ParameterHelp + ">");
+					else
+						Console.Write('\t');
+					Console.Write("\t");
+					if (string.IsNullOrEmpty(ca.Help) && string.IsNullOrEmpty(ca.ParameterHelp))
+					{
+						Console.Write("<" + ca.Type.ToString() + ">");
+					}
+					Console.WriteLine(ca.Help);
+				}
 			}
 		}
 	}

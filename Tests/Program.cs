@@ -15,14 +15,30 @@ namespace Tests
 			string outputFileName = string.Empty;
 
 			CmdArgs argProcessor = new CmdArgs() {
-				{ new CmdArgument("f,flag", ArgType.Flag, required: true) },
-				{ new CmdArgument("c,count", ArgType.Counter) },
-				{ new CmdArgument("d,double", ArgType.Double) },
-				{ new CmdArgument("i,int", ArgType.Int) },
-				{ new CmdArgument("s,string", ArgType.String, assign: (dynamic d) => { inputFileName = (string)d; }) },
-				{ new CmdArgument("", ArgType.String, assign: (dynamic d) => { outputFileName = (string)d; }) }
+				{ new CmdArgument("f,flag", ArgType.Flag, required: true,
+								  help: "Set a flag") },
+				{ new CmdArgument("c,count", ArgType.Counter,
+								  help: "Increment a counter") },
+				{ new CmdArgument("d,double", ArgType.Double,
+								  help: "Double precision floating point",
+								  parameter_help: "value") },
+				{ new CmdArgument("i,int", ArgType.Int,
+								  help: "Basic whole number argument",
+								  parameter_help: "integer") },
+				{ new CmdArgument("s,string",
+								  ArgType.String,
+								  parameter_help: "arbitrary string",
+								  assign: (dynamic d) => { inputFileName = (string)d; }) },
+				{ new CmdArgument("",
+								  ArgType.String,
+								  anonymous: true,
+								  parameter_help: "output file name",
+								  assign: (dynamic d) => { outputFileName = (string)d; }) }
 			};
 			
+			argProcessor.PrintHelp();
+			return;
+
 			string[] a = { "remainder1", "-f", "-c", "-c", "-s", "string abcdefg", "remainder2", "-double", "3.141593", "c", "-c", "-i=0x10" };
 			//string[] remainder = argProcessor.Parse(a);
 			string[] remainder;
