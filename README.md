@@ -1,5 +1,5 @@
 # KeioUtils
-C# utility function collection
+C# utility function collection. GPLv3.
 
 * __CmdArgs__  
   Handle command line arguments.  
