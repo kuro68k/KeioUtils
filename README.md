@@ -20,3 +20,8 @@ C# utility function collection
 * __TextUtils__  
   Various text handling utilities.  
   Mostly stuff for handling C format numbers (0b1010, 0x1F etc.).
+
+* __CRC__  
+  Calculate CRC16 (CCITT) and CRC32 values.  
+  Static methods are available for operating on byte buffers and streams.  
+  To process byte-by-byte create a CRC object and use the reset and load methods. For CRC16 use the last value returned by crc16_load(), for CRC32 you must call crc32_read() to get the value.

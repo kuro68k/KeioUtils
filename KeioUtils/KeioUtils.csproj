@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="BinaryUnits.cs" />
     <Compile Include="CmdArgs.cs" />
+    <Compile Include="CRC.cs" />
     <Compile Include="IntelHEX.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SIUnits.cs" />
