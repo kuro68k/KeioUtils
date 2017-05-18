@@ -105,6 +105,26 @@ namespace Keio.Utils
 			return true;
 		}
 
+		// pad a string at regular intervals
+		public static string PadString(string s, string padding, int spacing)
+		{
+			string output = "";
+			int i = 0;
+			while (i < s.Length)
+			{
+				output += s.Substring(i, spacing);
+				i += spacing;
+				if (i < s.Length)
+					output += padding;
+			}
+			return output;
+		}
+
+		public static string PadString(string s, char padding, int spacing)
+		{
+			return PadString(s, padding.ToString(), spacing);
+		}
+
 		// convert a number to binary string
 		public static string ToBinString(UInt64 u64, int digits)
 		{

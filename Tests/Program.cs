@@ -73,7 +73,8 @@ namespace Tests
 			Console.WriteLine(BinaryUnits.ToBinaryUnits(1234567890123456789) + "B");
 			Console.WriteLine();
 
-			Console.WriteLine(TextUtils.ToBinString((UInt64)0xB515F5F5F5F5F5F5), 64);
+			Console.WriteLine(TextUtils.ToBinString((UInt64)0xB515F5F5F5F5F5F5, 64));
+			Console.WriteLine(TextUtils.PadString(TextUtils.ToBinString((UInt32)0xB515F5F5), ' ', 4));
 			Console.WriteLine(TextUtils.ToBinString((byte)0x11));
 		}
 	}
