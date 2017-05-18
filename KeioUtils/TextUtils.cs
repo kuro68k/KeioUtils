@@ -104,5 +104,62 @@ namespace Keio.Utils
 			
 			return true;
 		}
+
+		// convert a number to binary string
+		public static string ToBinString(UInt64 u64, int digits)
+		{
+			if (digits > 64)
+				throw new Exception("Too many digits (max 64)");
+
+			UInt64 mask = 1;
+			var sb = new StringBuilder(new string('0', digits));
+			for (int i = 0; i < digits; i++)
+			{
+				if ((u64 & mask) != 0)
+					sb[digits - i - 1] = '1';
+				mask <<= 1;
+			}
+			return sb.ToString();
+		}
+
+		public static string ToBinString(UInt64 v)
+		{
+			return ToBinString((UInt64)v, 64);
+		}
+
+		public static string ToBinString(UInt32 v)
+		{
+			return ToBinString((UInt64)v, 32);
+		}
+
+		public static string ToBinString(UInt16 v)
+		{
+			return ToBinString((UInt64)v, 16);
+		}
+
+		public static string ToBinString(byte v)
+		{
+			return ToBinString((UInt64)v, 8);
+		}
+
+		public static string ToBinString(Int64 v)
+		{
+			return ToBinString((UInt64)v, 64);
+		}
+
+		public static string ToBinString(Int32 v)
+		{
+			return ToBinString((UInt64)v, 32);
+		}
+
+		public static string ToBinString(Int16 v)
+		{
+			return ToBinString((UInt64)v, 16);
+		}
+
+		public static string ToBinString(sbyte v)
+		{
+			return ToBinString((UInt64)v, 8);
+		}
 	}
 }

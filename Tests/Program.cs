@@ -37,7 +37,7 @@ namespace Tests
 			};
 			
 			argProcessor.PrintHelp();
-			return;
+			//return;
 
 			string[] a = { "remainder1", "-f", "-c", "-c", "-s", "string abcdefg", "remainder2", "-double", "3.141593", "c", "-c", "-i=0x10" };
 			//string[] remainder = argProcessor.Parse(a);
@@ -72,6 +72,9 @@ namespace Tests
 			Console.WriteLine(BinaryUnits.ToBinaryUnits((1024 * 1024 * 2) + 25323) + "B");
 			Console.WriteLine(BinaryUnits.ToBinaryUnits(1234567890123456789) + "B");
 			Console.WriteLine();
+
+			Console.WriteLine(TextUtils.ToBinString((UInt64)0xB515F5F5F5F5F5F5), 64);
+			Console.WriteLine(TextUtils.ToBinString((byte)0x11));
 		}
 	}
 }
