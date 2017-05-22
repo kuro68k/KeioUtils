@@ -40,6 +40,9 @@ namespace Keio.Utils
 		{
 			string s = "";
 
+			if (v == 0)
+				return v.ToString(format);
+
 			int idx = 0;
 			for (int exp = -21; exp <= 24; exp += 3)
 			{

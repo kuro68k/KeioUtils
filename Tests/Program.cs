@@ -61,10 +61,22 @@ namespace Tests
 			Console.WriteLine(SIUnits.ToSIUnits(0.001));
 			Console.WriteLine(SIUnits.ToSIUnits(0.000001));
 			Console.WriteLine(SIUnits.ToSIUnits(0.000000001, "F0"));
+			Console.WriteLine(SIUnits.ToSIUnits(0));
+			Console.WriteLine();
 
 			double v;
 			SIUnits.ParseSINumber("1.2k", out v);
 			Console.WriteLine(v.ToString());
+			if (!SIUnits.ParseSINumber("0.007", out v))
+				Console.WriteLine("Parse error 0.007");
+			Console.WriteLine(v.ToString());
+			Console.WriteLine();
+
+			int i;
+			if (!TextUtils.ParseInt("0x16DB", out i))
+				Console.WriteLine("Parse error TextUtils.ParseInt(\"0x16DB\", i)");
+			else
+				Console.WriteLine(i.ToString());
 			Console.WriteLine();
 
 			Console.WriteLine(BinaryUnits.ToBinaryUnits(256) + "B");
