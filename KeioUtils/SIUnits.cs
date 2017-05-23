@@ -87,10 +87,10 @@ namespace Keio.Utils
 				double m = Math.Pow(10, (double)exp) * margin;		// calculate every time to avoid precision/rounding errors
 				if (v <= m)
 				{
+					if (negative)
+						v = 0 - v;
 					m = Math.Pow(10, (double)exp - 3);
 					s = (v / m).ToString(format) + SelectedPrefixes[idx];
-					if (negative)
-						s = "-" + s;
 					return s;
 				}
 				idx++;
