@@ -56,12 +56,14 @@ namespace Tests
 			Console.WriteLine("outputFileName:\t" + outputFileName);
 			Console.WriteLine();
 
-			Console.WriteLine(SIUnits.ToSIUnits(123456789));
-			Console.WriteLine(SIUnits.ToSIUnits(123456789.0123456789));
-			Console.WriteLine(SIUnits.ToSIUnits(0.001));
-			Console.WriteLine(SIUnits.ToSIUnits(0.000001));
-			Console.WriteLine(SIUnits.ToSIUnits(0.000000001, "F0"));
-			Console.WriteLine(SIUnits.ToSIUnits(0));
+			Console.WriteLine("123456789.0123456789\t" + SIUnits.ToSIUnits(123456789.0123456789));
+			Console.WriteLine("123456789\t" + SIUnits.ToSIUnits(123456789));
+			Console.WriteLine("0.001\t\t" + SIUnits.ToSIUnits(0.001));
+			Console.WriteLine("0.000001\t" + SIUnits.ToSIUnits(0.000001));
+			Console.WriteLine("0.000000001 F0\t" + SIUnits.ToSIUnits(0.000000001, "F0"));
+			Console.WriteLine("(double)0 u\t" + SIUnits.ToSIUnits((double)0, minimum_unit: "u"));
+			Console.WriteLine("-0.0007 m\t" + SIUnits.ToSIUnits(-0.0007, minimum_unit: "m"));
+			Console.WriteLine("-0.0007\t\t" + SIUnits.ToSIUnits(-0.0007));
 			Console.WriteLine();
 
 			double v;
