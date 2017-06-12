@@ -207,10 +207,11 @@ namespace Keio.Utils
 								throw new ArgumentException("Duplicate argument.", ca.AllNames);
 
 							ca.WasMatched = true;
-							if (ca.Type == ArgType.Flag)
-								ca.Value = true;
-							else if (ca.Type == ArgType.Counter)
-								ca.Value++;
+							if ((ca.Type == ArgType.Flag) || (ca.Type == ArgType.Counter))	// no parameters
+							{
+								if (!ca.ParseValue(""))
+									throw new ArgumentException("Parsing error.", ca.AllNames);
+							}
 							else
 							{
 								if (cmdList.Count < 1)

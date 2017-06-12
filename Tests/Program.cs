@@ -13,10 +13,12 @@ namespace Tests
 		{
 			string inputFileName = string.Empty;
 			string outputFileName = string.Empty;
+			bool flag = false;
 
 			CmdArgs argProcessor = new CmdArgs() {
 				{ new CmdArgument("f,flag", ArgType.Flag, required: true,
-								  help: "Set a flag") },
+								  help: "Set a flag",
+								  assign: (dynamic d) => { flag = (bool)d; }) },
 				{ new CmdArgument("c,count", ArgType.Counter,
 								  help: "Increment a counter") },
 				{ new CmdArgument("d,double", ArgType.Double,
@@ -54,7 +56,10 @@ namespace Tests
 
 			Console.WriteLine("inputFileName:\t" + inputFileName);
 			Console.WriteLine("outputFileName:\t" + outputFileName);
+			Console.WriteLine("flag:\t\t" + flag.ToString());
 			Console.WriteLine();
+
+			return;
 
 			Console.WriteLine("123456789.0123456789\t" + SIUnits.ToSIUnits(123456789.0123456789));
 			Console.WriteLine("123456789\t" + SIUnits.ToSIUnits(123456789));
