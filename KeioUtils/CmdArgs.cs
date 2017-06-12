@@ -340,6 +340,12 @@ namespace Keio.Utils
 			Console.Write(" [options]");
 			foreach (CmdArgument ca in _argList)
 			{
+				if (ca.IsRequired)
+				{
+					Console.Write(" -" + ca.Name);
+					Console.Write(" <" + ca.ParameterHelp + ">");
+				}
+
 				if (ca.IsAnonymous)
 				{
 					Console.Write(" <");

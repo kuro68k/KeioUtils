@@ -16,12 +16,12 @@ namespace Tests
 			bool flag = false;
 
 			CmdArgs argProcessor = new CmdArgs() {
-				{ new CmdArgument("f,flag", ArgType.Flag, required: true,
+				{ new CmdArgument("f,flag", ArgType.Flag,
 								  help: "Set a flag",
 								  assign: (dynamic d) => { flag = (bool)d; }) },
 				{ new CmdArgument("c,count", ArgType.Counter,
 								  help: "Increment a counter") },
-				{ new CmdArgument("d,double", ArgType.Double,
+				{ new CmdArgument("d,double", ArgType.Double, required: true,
 								  help: "Double precision floating point",
 								  parameter_help: "value") },
 				{ new CmdArgument("i,int", ArgType.Int,
