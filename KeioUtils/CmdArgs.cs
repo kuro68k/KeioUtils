@@ -342,18 +342,23 @@ namespace Keio.Utils
 			{
 				if (ca.IsRequired)
 				{
-					Console.Write(" -" + ca.Name);
-					Console.Write(" <" + ca.ParameterHelp + ">");
+					if (ca.IsAnonymous)
+						Console.Write(" \"" + ca.ParameterHelp + "\"");
+					else
+					{
+						Console.Write(" -" + ca.Name);
+						Console.Write(" <" + ca.ParameterHelp + ">");
+					}
 				}
 
-				if (ca.IsAnonymous)
+				else if (ca.IsAnonymous)
 				{
 					Console.Write(" <");
 					string s = ca.Name;
 					if (string.IsNullOrEmpty(s))
 						s = ca.ParameterHelp;
 					if (string.IsNullOrEmpty(s))
-						s = "<anonymous argument>";
+						s = "anonymous argument";
 					Console.Write(s);
 					Console.Write(">");
 				}
