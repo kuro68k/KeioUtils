@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace Keio.Utils
 {
@@ -105,7 +106,7 @@ namespace Keio.Utils
 			return true;
 		}
 
-		// pad a string at regular intervals
+		// pad a string at regular intervals e.g. 0000 0000 0000 0000
 		public static string PadString(string s, string padding, int spacing)
 		{
 			string output = "";
@@ -123,6 +124,46 @@ namespace Keio.Utils
 		public static string PadString(string s, char padding, int spacing)
 		{
 			return PadString(s, padding.ToString(), spacing);
+		}
+
+		// convert string to a fixed length with padding/truncation
+		public static string FixedLengthString(string s, char padding, int length)
+		{
+			if (s.Length > length)
+				return "..." + s.Substring(s.Length - length + 3);
+
+			if (s.Length < length)
+				return s.PadRight(length, padding);
+
+			return s;
+		}
+
+		// convert a path+filename to a fixed length string with padding/truncation
+		static string FixedLengthFilename(string filename, char padding, int length)
+		{
+			if (filename.Length == length)
+				return filename;
+
+			while (filename.Length > length)
+			{
+				int p = filename.IndexOf(Path.VolumeSeparatorChar);
+				if (p == -1)
+					p = filename.IndexOf(Path.DirectorySeparatorChar);
+				if (p == -1)
+					p = filename.IndexOf(Path.AltDirectorySeparatorChar);
+				if ((p != -1) && (filename.Length > p + 1))
+					filename = filename.Substring(p + 1);
+				else
+					break;
+			}
+
+			if (filename.Length > length)
+				filename = "..." + filename.Substring(filename.Length - length + 3);
+
+			if (filename.Length < length)
+				filename = filename.PadRight(length, padding);
+
+			return filename;
 		}
 
 		// convert a number to binary string
