@@ -141,6 +141,8 @@ namespace Keio.Utils
 	public class CmdArgs : List<CmdArgument>
 	{
 		private List<CmdArgument> _argList;
+		private int _helpColumnWidth = 16;
+		public int HelpColumnWidth { get { return _helpColumnWidth; } set { _helpColumnWidth = value; } }
 
 		public CmdArgs()
 		{
@@ -370,13 +372,13 @@ namespace Keio.Utils
 			{
 				if (!ca.IsAnonymous)
 				{
-					Console.Write("  -");
-					Console.Write(ca.Name);
+					string left = "  -";
+					left += ca.Name;
 					if (!string.IsNullOrEmpty(ca.ParameterHelp))
-						Console.Write(" <" + ca.ParameterHelp + ">");
-					else
-						Console.Write('\t');
-					Console.Write("\t");
+						left += " <" + ca.ParameterHelp + ">";
+					left = TextUtils.FixedLengthString(left, ' ', _helpColumnWidth);
+					Console.Write(left + " ");
+
 					if (string.IsNullOrEmpty(ca.Help) && string.IsNullOrEmpty(ca.ParameterHelp))
 					{
 						Console.Write("<" + ca.Type.ToString() + ">");
