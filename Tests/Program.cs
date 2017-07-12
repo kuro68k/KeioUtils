@@ -44,6 +44,15 @@ namespace Tests
 			};
 			
 			argProcessor.PrintHelp();
+
+			//                                      0         1         2         3         4         5         6         7         8         9         9         1
+			//                                      012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
+			//                                      _test6, test7, test8,
+			//                                      1234567890123456789_test6
+			Console.WriteLine(TextUtils.WrapString("test1, test2, test3, test4, test5, 12345678901234567890test6, test7, test8,,", 20));
+			Console.WriteLine();
+			Console.WriteLine(TextUtils.Reformat("     test1,   test2, test3,\ttest4, test5, 12345678901234567890test6, test7, test8,,", 20));
+
 			return;
 
 			string[] a = { "remainder1", "-f", "-c", "-c", "-s", "string abcdefg", "remainder2", "-double", "3.141593", "c", "-c", "-i=0x10" };

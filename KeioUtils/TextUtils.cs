@@ -9,6 +9,54 @@ namespace Keio.Utils
 {
 	public class TextUtils
 	{
+		// wrap a string, splitting on commas, periods or with hyphens
+		public static string WrapString(string s, int max_width)
+		{
+			string w = "";
+			int last_split_point = -1;
+			int last_newline = 0;
+			int width = 0;
+			bool skip_spaces = false;
+
+			for (int i = 0; i < s.Length; i++)
+			{
+				if (skip_spaces && (Char.IsWhiteSpace(s[i])))
+				{
+					last_newline = i;
+					continue;
+				}
+				skip_spaces = false;
+
+				width++;
+				if (width > max_width)
+				{
+					if (last_split_point == -1)		// no split points found
+					{
+						w += s.Substring(last_newline, width).Trim() + "-\n";
+						last_newline = i + 1;
+						width = 0;
+					}
+					else
+					{
+						w += s.Substring(last_newline, last_split_point - last_newline + 1).Trim() + "\n";
+						width = i - last_split_point;
+						last_newline = last_split_point + 1;
+					}
+					skip_spaces = true;
+					last_split_point = -1;
+				}
+
+				if ((s[i] == '.') || (s[i] == ','))
+					last_split_point = i;
+			}
+
+			// any remaining text
+			if (last_newline != s.Length)
+				w += s.Substring(last_newline);
+
+			return w;
+		}
+
 		// compact whitespace so that multiple spaces are reduce to just one
 		public static string CompactWhitespace(string s)
 		{
@@ -31,6 +79,12 @@ namespace Keio.Utils
 			}
 
 			return comp;
+		}
+
+		// compact whitespace and word wrap to max_width
+		public static string Reformat(string s, int max_width)
+		{
+			return WrapString(CompactWhitespace(s), max_width);
 		}
 
 		// checks if a string is a C format number (decminal, 0b, 0x)
