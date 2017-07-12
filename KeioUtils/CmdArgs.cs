@@ -273,6 +273,12 @@ namespace Keio.Utils
 			}
 		}
 
+		public bool TryParse(string[] args)
+		{
+			string[] remainder;
+			return TryParse(args, out remainder);
+		}
+
 		// parse non-option arguments (remainders)
 		public void ParseRemainders(string[] remainders, out string p1)
 		{
