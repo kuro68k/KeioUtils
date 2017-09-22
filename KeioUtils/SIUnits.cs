@@ -156,7 +156,7 @@ namespace Keio.Utils
 				int idx = 0;
 				for (int exp = -21; exp <= 24; exp += 3)
 				{
-					if (suffix == Prefixes[idx])
+					if ((suffix == Prefixes[idx]) || (suffix == PrefixesLatin[idx]))
 					{
 						multiplier = Math.Pow(10, (double)exp - 3);		// calculate every time to avoid precision/rounding errors
 						break;
