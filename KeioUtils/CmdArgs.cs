@@ -17,42 +17,44 @@ namespace Keio.Utils
 
 	public class CmdArgument
 	{
-		private string[] _names;
+		private string[] _option_names;
 		private dynamic _value;
 		private ArgType _type;
-		private bool _required;
 		private Action<dynamic> _assign;
 		private string _help;
-		private string _parameter_help;
+		private string _short_description;
 		private bool _matched;
-		private bool _anonymous;
+		private bool _required;
 
+		public bool IsOption { get { return _option_names != null; } }
 		public bool IsRequired { get { return _required; } }
-		public bool IsAnonymous { get { return _anonymous; } }
 		public bool WasMatched { get { return _matched; } set { _matched = value; } }
-		public string Name { get { if (_names != null) return _names[0]; else return "(anon)"; } }
-		public string AllNames { get { return string.Join(",", _names); } }
+		public string Name { get { if (_option_names != null) return _option_names[0]; else return "(anon)"; } }
+		public string AllOptionNames { get { return string.Join(",", _option_names); } }
+		public string[] OptionNameList { get { return _option_names; } }
 		public dynamic Value { get { return _value; } set { _value = value; } }
 		public string Help { get { return _help; } set { _help = value; } }
-		public string ParameterHelp { get { return _parameter_help; } set { _parameter_help = value; } }
+		public string ShortDescription { get { return _short_description; } set { _short_description = value; } }
 		public ArgType Type { get { return _type; } }
 
-		public CmdArgument(string names, ArgType type,
+		public CmdArgument(ArgType type,
+						   string option_names = "",
 						   string help = "",
-						   string parameter_help = "",
+						   string short_description = "",
 						   bool required = false,
-						   bool anonymous = false,
 						   Action<dynamic> assign = default(Action<dynamic>))
 		{
 			_type = type;
 			_value = NewArgType(type);
-			_names = names.Split(',');
-			_required = required;
+			if (!string.IsNullOrEmpty(option_names))
+				_option_names = option_names.Split(',');
+			else
+				option_names = null;
 			_assign = assign;
 			_help = help;
-			_parameter_help = parameter_help;
+			_short_description = short_description;
+			_required = required;
 			_matched = false;
-			_anonymous = anonymous;
 		}
 
 		// generate a new dynamic object with type suitable for ArgType
@@ -76,7 +78,7 @@ namespace Keio.Utils
 		// match the argument's name(s) to a string
 		public bool MatchesName(string name)
 		{
-			foreach(string n in _names)
+			foreach(string n in _option_names)
 			{
 				if (n == name)
 					return true;
@@ -198,30 +200,27 @@ namespace Keio.Utils
 					bool match = false;
 					foreach (CmdArgument ca in _argList)
 					{
-						if (ca.IsAnonymous)
-							continue;
-
 						if (ca.MatchesName(cmd))
 						{
 							match = true;
 
 							if (ca.WasMatched && (ca.Type != ArgType.Counter))
-								throw new ArgumentException("Duplicate argument.", ca.AllNames);
+								throw new ArgumentException("Duplicate argument.", ca.AllOptionNames);
 
 							ca.WasMatched = true;
 							if ((ca.Type == ArgType.Flag) || (ca.Type == ArgType.Counter))	// no parameters
 							{
 								if (!ca.ParseValue(""))
-									throw new ArgumentException("Parsing error.", ca.AllNames);
+									throw new ArgumentException("Parsing error.", ca.AllOptionNames);
 							}
 							else
 							{
 								if (cmdList.Count < 1)
-									throw new ArgumentException("Missing parameter.", ca.AllNames);
+									throw new ArgumentException("Missing parameter.", ca.AllOptionNames);
 								string param = cmdList[0];
 								cmdList.RemoveAt(0);
 								if (!ca.ParseValue(param))
-									throw new ArgumentException("Bad parameter \"" + param + "\".", ca.AllNames);
+									throw new ArgumentException("Bad parameter \"" + param + "\".", ca.AllOptionNames);
 							}
 							break;	// foreach
 						}
@@ -238,8 +237,6 @@ namespace Keio.Utils
 			int i = 0;
 			foreach (CmdArgument ca in _argList)
 			{
-				if (!ca.IsAnonymous)
-					continue;
 				if (remainder.Count > i)
 				{
 					ca.ParseValue(remainder[i++]);
@@ -249,8 +246,8 @@ namespace Keio.Utils
 
 			foreach (CmdArgument ca in _argList)
 			{
-				if (!ca.WasMatched && ca.IsRequired)
-					throw new ArgumentException("Argument is required.", ca.AllNames);
+				if (!ca.WasMatched && ca.IsOption)
+					throw new ArgumentException("Argument is required.", ca.AllOptionNames);
 			}
 			
 			return remainder.ToArray();
@@ -335,6 +332,15 @@ namespace Keio.Utils
 			}
 		}
 
+		// check if argument list contains optional parameters
+		private bool HasOptions()
+		{
+			foreach (CmdArgument ca in _argList)
+				if (!ca.IsOption)
+					return true;
+			return false;
+		}
+
 		// print help
 		public void PrintHelp()
 		{
@@ -345,50 +351,39 @@ namespace Keio.Utils
 		{
 			// headline
 			Console.Write(appName);
-			Console.Write(" [options]");
+			if (HasOptions())
+				Console.Write(" [options]");
 			foreach (CmdArgument ca in _argList)
 			{
-				if (ca.IsRequired)
-				{
-					if (ca.IsAnonymous)
-						Console.Write(" \"" + ca.ParameterHelp + "\"");
-					else
-					{
-						Console.Write(" -" + ca.Name);
-						Console.Write(" <" + ca.ParameterHelp + ">");
-					}
-				}
+				if (ca.IsOption)
+					continue;
 
-				else if (ca.IsAnonymous)
-				{
-					Console.Write(" <");
-					string s = ca.Name;
-					if (string.IsNullOrEmpty(s))
-						s = ca.ParameterHelp;
-					if (string.IsNullOrEmpty(s))
-						s = "anonymous argument";
-					Console.Write(s);
+				Console.Write(" ");
+				if (!ca.IsRequired)
+					Console.Write("<");
+				Console.Write(ca.ShortDescription);
+				if (!ca.IsRequired)
 					Console.Write(">");
-				}
 			}
 			Console.WriteLine();
 
 			// options
+
+			if (!HasOptions())
+				return;
+
+			Console.WriteLine();
+			Console.WriteLine("Options:");
 			foreach (CmdArgument ca in _argList)
 			{
-				if (!ca.IsAnonymous)
+				if (ca.IsOption)
 				{
 					string left = "  -";
-					left += ca.Name;
-					if (!string.IsNullOrEmpty(ca.ParameterHelp))
-						left += " <" + ca.ParameterHelp + ">";
-					left = TextUtils.FixedLengthString(left, ' ', _helpColumnWidth);
+					left += ca.AllOptionNames;
+					if (!string.IsNullOrEmpty(ca.ShortDescription))
+						left += " <" + ca.ShortDescription + ">";
+					left = left.PadRight(_helpColumnWidth);
 					Console.Write(left + " ");
-
-					if (string.IsNullOrEmpty(ca.Help) && string.IsNullOrEmpty(ca.ParameterHelp))
-					{
-						Console.Write("<" + ca.Type.ToString() + ">");
-					}
 					Console.WriteLine(ca.Help);
 				}
 			}

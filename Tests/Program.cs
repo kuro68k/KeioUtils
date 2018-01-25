@@ -16,34 +16,37 @@ namespace Tests
 			bool flag = false;
 
 			CmdArgs argProcessor = new CmdArgs() {
-				{ new CmdArgument("f,flag", ArgType.Flag,
+				{ new CmdArgument(ArgType.Flag,
+								  option_names: "f,flag",
 								  help: "Set a flag",
 								  assign: (dynamic d) => { flag = (bool)d; }) },
-				{ new CmdArgument("c,count", ArgType.Counter,
+				{ new CmdArgument(ArgType.Counter,
+								  option_names: "c,count",
 								  help: "Increment a counter") },
-				{ new CmdArgument("d,double", ArgType.Double,
-								  help: "Double precision floating point",
-								  parameter_help: "value") },
-				{ new CmdArgument("i,int", ArgType.Int,
-								  help: "Basic whole number argument",
-								  parameter_help: "integer") },
-				{ new CmdArgument("s,string",
-								  ArgType.String,
+				{ new CmdArgument(ArgType.Double,
+								  option_names: "d,double",
+								  help: "Double precision floating point") },
+				{ new CmdArgument(ArgType.Int,
+								  option_names: "i,int",
+								  help: "Basic integer argument") },
+				{ new CmdArgument(ArgType.String,
+								  option_names: "s,string",
 								  help: "Arbitrary string",
 								  assign: (dynamic d) => { inputFileName = (string)d; }) },
-				{ new CmdArgument("",
-								  ArgType.String,
-								  anonymous: true,
+				{ new CmdArgument(ArgType.String,
 								  required: true,
-								  parameter_help: "output_file",
+								  short_description: "output_file",
 								  assign: (dynamic d) => { outputFileName = (string)d; }) },
-				{ new CmdArgument("",
-								  ArgType.String,
-								  anonymous: true,
-								  parameter_help: "not required") }
+				{ new CmdArgument(ArgType.String,
+								  required: true,
+								  short_description: "input_file",
+								  assign: (dynamic d) => { outputFileName = (string)d; }) },
+				{ new CmdArgument(ArgType.String,
+								  short_description: "not_required") }
 			};
 			
 			argProcessor.PrintHelp();
+			Console.WriteLine();
 
 			//                                      0         1         2         3         4         5         6         7         8         9         9         1
 			//                                      012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
