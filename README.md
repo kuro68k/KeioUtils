@@ -3,7 +3,9 @@ C# utility function collection. GPLv3.
 
 * __CmdArgs__  
   Handle command line arguments.  
-  Options can be specified by '/' or '-'. Options can have multiple names. Option parameters can be separated by a space or '='. Multiple data types supported. Anonymous arguments. Automatic help text generation.
+  Options can be specified by '/' or '-'. Options can have multiple names. Option parameters can be separated by a space or '='. Multiple data types supported. Automatic help text generation.
+
+Arguments can be either options or normal arguments. Normal arguments can be optional and supplied in order on the command line. Options are named (e.g. -o or -option) and can be supplied, with optional parameters, in any order.
 
 * __IntelHEX__  
   Create/decode Intel HEX files.  

@@ -368,7 +368,6 @@ namespace Keio.Utils
 			Console.WriteLine();
 
 			// options
-
 			if (!HasOptions())
 				return;
 
