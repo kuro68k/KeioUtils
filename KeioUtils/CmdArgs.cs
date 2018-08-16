@@ -15,9 +15,9 @@ namespace Keio.Utils
 		Counter
 	}
 
+
 	public class CmdArgument
 	{
-		private string[] _option_names;
 		private dynamic _value;
 		private ArgType _type;
 		private Action<dynamic> _assign;
@@ -26,19 +26,14 @@ namespace Keio.Utils
 		private bool _matched;
 		private bool _required;
 
-		public bool IsOption { get { return _option_names != null; } }
-		public bool IsRequired { get { return _required; } }
-		public bool WasMatched { get { return _matched; } set { _matched = value; } }
-		public string Name { get { if (_option_names != null) return _option_names[0]; else return "(anon)"; } }
-		public string AllOptionNames { get { return string.Join(",", _option_names); } }
-		public string[] OptionNameList { get { return _option_names; } }
 		public dynamic Value { get { return _value; } set { _value = value; } }
+		public ArgType Type { get { return _type; } }
 		public string Help { get { return _help; } set { _help = value; } }
 		public string ShortDescription { get { return _short_description; } set { _short_description = value; } }
-		public ArgType Type { get { return _type; } }
+		public bool WasMatched { get { return _matched; } set { _matched = value; } }
+		public bool IsRequired { get { return _required; } }
 
 		public CmdArgument(ArgType type,
-						   string option_names = "",
 						   string help = "",
 						   string short_description = "",
 						   bool required = false,
@@ -46,10 +41,6 @@ namespace Keio.Utils
 		{
 			_type = type;
 			_value = NewArgType(type);
-			if (!string.IsNullOrEmpty(option_names))
-				_option_names = option_names.Split(',');
-			else
-				option_names = null;
 			_assign = assign;
 			_help = help;
 			_short_description = short_description;
@@ -73,17 +64,6 @@ namespace Keio.Utils
 					return new bool();
 			}
 			return null;
-		}
-
-		// match the argument's name(s) to a string
-		public bool MatchesName(string name)
-		{
-			foreach(string n in _option_names)
-			{
-				if (n == name)
-					return true;
-			}
-			return false;
 		}
 
 		// parse a string and set the argument's value
@@ -140,11 +120,43 @@ namespace Keio.Utils
 
 
 
+	public class CmdOptionArgument : CmdArgument
+	{
+		private string[] _option_names;
+
+		public string Name { get { if (_option_names != null) return _option_names[0]; else return "(anon)"; } }
+		public string AllOptionNames { get { return string.Join(",", _option_names); } }
+		public string[] OptionNameList { get { return _option_names; } }
+
+		public CmdOptionArgument(ArgType type, string option_names = "", string help = "", string short_description = "", bool required = false, Action<dynamic> assign = default(Action<dynamic>)) :
+								base(type, help, short_description, required, assign)
+		{
+			if (string.IsNullOrEmpty(option_names))
+				throw new ArgumentException("Options must be named", "option_names");
+			_option_names = option_names.Split(',');
+		}
+
+		// match the argument's name(s) to a string
+		public bool MatchesName(string name)
+		{
+			foreach(string n in _option_names)
+			{
+				if (n == name)
+					return true;
+			}
+			return false;
+		}
+	}
+
+
+
 	public class CmdArgs : List<CmdArgument>
 	{
 		private List<CmdArgument> _argList;
-		private int _helpColumnWidth = 16;
+		private List<CmdOptionArgument> _optionList;
+		private int _helpColumnWidth = 30;
 		public int HelpColumnWidth { get { return _helpColumnWidth; } set { _helpColumnWidth = value; } }
+		public bool PosixMode = false;
 
 		public CmdArgs()
 		{
@@ -153,6 +165,12 @@ namespace Keio.Utils
 
 		public CmdArgs(List<CmdArgument> argList)
 		{
+			_argList = argList;
+		}
+
+		public CmdArgs(List<CmdOptionArgument> optionList, List<CmdArgument> argList)
+		{
+			_optionList = optionList;
 			_argList = argList;
 		}
 
@@ -198,7 +216,7 @@ namespace Keio.Utils
 				{
 					cmd = cmd.Substring(1);
 					bool match = false;
-					foreach (CmdArgument ca in _argList)
+					foreach (CmdOptionArgument ca in _optionList)
 					{
 						if (ca.MatchesName(cmd))
 						{
@@ -233,7 +251,7 @@ namespace Keio.Utils
 					remainder.Add(cmd);
 			}
 
-			// anonymous option arguments
+			// normal non-option arguments
 			int i = 0;
 			foreach (CmdArgument ca in _argList)
 			{
@@ -244,10 +262,15 @@ namespace Keio.Utils
 				}
 			}
 
+			foreach (CmdOptionArgument ca in _optionList)
+			{
+				if (!ca.WasMatched && ca.IsRequired)
+					throw new ArgumentException("Argument is required.", ca.Name);
+			}
 			foreach (CmdArgument ca in _argList)
 			{
-				if (!ca.WasMatched && ca.IsOption)
-					throw new ArgumentException("Argument is required.", ca.AllOptionNames);
+				if (!ca.WasMatched && ca.IsRequired)
+					throw new ArgumentException("Argument is required.", ca.ShortDescription);
 			}
 			
 			return remainder.ToArray();
@@ -328,36 +351,37 @@ namespace Keio.Utils
 		{
 			foreach (CmdArgument ca in _argList)
 			{
+				Console.WriteLine(ca.ShortDescription + "\t" + ca.Value.ToString());
+			}
+			foreach (CmdOptionArgument ca in _optionList)
+			{
 				Console.WriteLine(ca.Name + "\t" + ca.Value.ToString());
 			}
-		}
-
-		// check if argument list contains optional parameters
-		private bool HasOptions()
-		{
-			foreach (CmdArgument ca in _argList)
-				if (!ca.IsOption)
-					return true;
-			return false;
 		}
 
 		// print help
 		public void PrintHelp()
 		{
-			PrintHelp(System.AppDomain.CurrentDomain.FriendlyName);
+			string name = System.AppDomain.CurrentDomain.FriendlyName;
+			if (name.EndsWith(".exe"))
+				name = name.Substring(0, name.Length - 4);
+			PrintHelp(name);
 		}
 		
 		public void PrintHelp(string appName)
 		{
+			if (PosixMode)
+			{
+				PrintHelpPOSIX(appName);
+				return;
+			}
+
 			// headline
 			Console.Write(appName);
-			if (HasOptions())
+			if (_optionList != null)
 				Console.Write(" [options]");
 			foreach (CmdArgument ca in _argList)
 			{
-				if (ca.IsOption)
-					continue;
-
 				Console.Write(" ");
 				if (!ca.IsRequired)
 					Console.Write("<");
@@ -368,24 +392,78 @@ namespace Keio.Utils
 			Console.WriteLine();
 
 			// options
-			if (!HasOptions())
+			if (_optionList == null)
 				return;
 
 			Console.WriteLine();
 			Console.WriteLine("Options:");
-			foreach (CmdArgument ca in _argList)
+			foreach (CmdOptionArgument ca in _optionList)
 			{
-				if (ca.IsOption)
-				{
-					string left = "  -";
-					left += ca.AllOptionNames;
-					if (!string.IsNullOrEmpty(ca.ShortDescription))
-						left += " <" + ca.ShortDescription + ">";
-					left = left.PadRight(_helpColumnWidth);
-					Console.Write(left + " ");
-					Console.WriteLine(ca.Help);
-				}
+				string left = "  -";
+				left += ca.AllOptionNames;
+				if (!string.IsNullOrEmpty(ca.ShortDescription))
+					//left += " <" + ca.ShortDescription + ">";
+					left += "=" + ca.ShortDescription;
+				left = left.PadRight(_helpColumnWidth);
+				Console.Write(left + " ");
+				Console.WriteLine(ca.Help);
 			}
+		}
+
+		public void PrintHelpPOSIX(string appName)
+		{
+			Console.Write(appName);
+
+			foreach (var opt in _optionList)
+			{
+				Console.Write(" [-" + opt.Name);
+				if ((opt.Type != ArgType.Flag) && (opt.Type != ArgType.Counter))
+					Console.Write(" " + opt.ShortDescription);
+				Console.Write("]");
+			}
+			foreach (var arg in _argList)
+				Console.Write(" [" + arg.ShortDescription + "]");
+		}
+
+		// split command line arguments into a list of strings
+		public static string[] SplitArgs(string args)
+		{
+			if (string.IsNullOrEmpty(args))
+				return null;
+
+			List<string> a = new List<string>();
+			StringBuilder sb = new StringBuilder();
+			int idx = 0;
+			bool inQuotedString = false;
+
+			while (idx < args.Length)
+			{
+				char c = args[idx++];
+
+				if (c == '"')
+				{
+					inQuotedString = !inQuotedString;
+					continue;
+				}
+				if (inQuotedString)
+				{
+					sb.Append(c);
+					continue;
+				}
+				
+				if ((c == ' ') || (c == '='))
+				{
+					if (sb.Length > 0)
+						a.Add(sb.ToString());
+					sb.Clear();
+				}
+				else
+					sb.Append(c);
+			}
+			if (sb.Length > 0)
+				a.Add(sb.ToString());
+
+			return a.ToArray();
 		}
 	}
 }

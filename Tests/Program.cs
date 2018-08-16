@@ -15,50 +15,50 @@ namespace Tests
 			string outputFileName = string.Empty;
 			bool flag = false;
 
-			CmdArgs argProcessor = new CmdArgs() {
-				{ new CmdArgument(ArgType.Flag,
-								  option_names: "f,flag",
-								  help: "Set a flag",
-								  assign: (dynamic d) => { flag = (bool)d; }) },
-				{ new CmdArgument(ArgType.Counter,
-								  option_names: "c,count",
-								  help: "Increment a counter") },
-				{ new CmdArgument(ArgType.Double,
-								  option_names: "d,double",
-								  help: "Double precision floating point") },
-				{ new CmdArgument(ArgType.Int,
-								  option_names: "i,int",
-								  help: "Basic integer argument") },
-				{ new CmdArgument(ArgType.String,
-								  option_names: "s,string",
-								  help: "Arbitrary string",
-								  assign: (dynamic d) => { inputFileName = (string)d; }) },
-				{ new CmdArgument(ArgType.String,
-								  required: true,
-								  short_description: "output_file",
-								  assign: (dynamic d) => { outputFileName = (string)d; }) },
-				{ new CmdArgument(ArgType.String,
-								  required: true,
-								  short_description: "input_file",
-								  assign: (dynamic d) => { outputFileName = (string)d; }) },
-				{ new CmdArgument(ArgType.String,
-								  short_description: "not_required") }
-			};
+			CmdArgs argProcessor = new CmdArgs(
+				new List<CmdOptionArgument> {
+					{ new CmdOptionArgument(ArgType.Flag,
+									  option_names: "f,flag",
+									  help: "Set a flag",
+									  assign: (dynamic d) => { flag = (bool)d; }) },
+					{ new CmdOptionArgument(ArgType.Counter,
+									  option_names: "c,count",
+									  help: "Increment a counter") },
+					{ new CmdOptionArgument(ArgType.Double,
+									  option_names: "d,double",
+									  short_description: "double",
+									  help: "Double precision floating point") },
+					{ new CmdOptionArgument(ArgType.Int,
+									  option_names: "i,int",
+									  short_description: "integer",
+									  help: "Basic integer argument") },
+					{ new CmdOptionArgument(ArgType.String,
+									  option_names: "s,string",
+									  short_description: "string",
+									  help: "Arbitrary string",
+									  assign: (dynamic d) => { inputFileName = (string)d; }) },
+				},
+				new List<CmdArgument> {
+					{ new CmdArgument(ArgType.String,
+									  required: true,
+									  short_description: "output_file",
+									  assign: (dynamic d) => { outputFileName = (string)d; }) },
+					{ new CmdArgument(ArgType.String,
+									  required: true,
+									  short_description: "input_file",
+									  assign: (dynamic d) => { outputFileName = (string)d; }) },
+					{ new CmdArgument(ArgType.String,
+									  short_description: "not_required") }
+				}
+			);
 			
 			argProcessor.PrintHelp();
 			Console.WriteLine();
 
-			//                                      0         1         2         3         4         5         6         7         8         9         9         1
-			//                                      012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
-			//                                      _test6, test7, test8,
-			//                                      1234567890123456789_test6
-			Console.WriteLine(TextUtils.WrapString("test1, test2, test3, test4, test5, 12345678901234567890test6, test7, test8,,", 20));
-			Console.WriteLine();
-			Console.WriteLine(TextUtils.Reformat("     test1,   test2, test3,\ttest4, test5, 12345678901234567890test6, test7, test8,,", 20));
+			string commandLineArgs = "arg0 -f -c -c -s \"string with space\" arg1 -double 3.141593 c -c -i=0x10";
+			string[] a = CmdArgs.SplitArgs(commandLineArgs);
 
-			return;
-
-			string[] a = { "remainder1", "-f", "-c", "-c", "-s", "string abcdefg", "remainder2", "-double", "3.141593", "c", "-c", "-i=0x10" };
+			//string[] a = { "arg0", "-f", "-c", "-c", "-s", "string abcdefg", "arg1", "-double", "3.141593", "c", "-c", "-i=0x10" };
 			//string[] remainder = argProcessor.Parse(a);
 			string[] remainder;
 			if (argProcessor.TryParse(a, out remainder))
@@ -70,6 +70,7 @@ namespace Tests
 			}
 			else
 				Console.WriteLine("Arguments bad.");
+			Console.WriteLine();
 
 			Console.WriteLine("inputFileName:\t" + inputFileName);
 			Console.WriteLine("outputFileName:\t" + outputFileName);
@@ -77,6 +78,14 @@ namespace Tests
 			Console.WriteLine();
 
 			return;
+
+			//                                      0         1         2         3         4         5         6         7         8         9         9         1
+			//                                      012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
+			//                                      _test6, test7, test8,
+			//                                      1234567890123456789_test6
+			Console.WriteLine(TextUtils.WrapString("test1, test2, test3, test4, test5, 12345678901234567890test6, test7, test8,,", 20));
+			Console.WriteLine();
+			Console.WriteLine(TextUtils.Reformat("     test1,   test2, test3,\ttest4, test5, 12345678901234567890test6, test7, test8,,", 20));
 
 			Console.WriteLine("123456789.0123456789\t" + SIUnits.ToSIUnits(123456789.0123456789));
 			Console.WriteLine("123456789\t" + SIUnits.ToSIUnits(123456789));
